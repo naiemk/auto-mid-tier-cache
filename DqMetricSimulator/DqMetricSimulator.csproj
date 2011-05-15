@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{79E206D8-CADC-44E7-A6C8-38CDF1451E0A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DqMetricSimulator</RootNamespace>
+    <AssemblyName>DqMetricSimulator</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\Autofac\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration">
+      <HintPath>..\..\Autofac\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\Column.cs" />
+    <Compile Include="Data\ImportDataTable.cs" />
+    <Compile Include="Data\TableFactory.cs" />
+    <Compile Include="Dq\DeterministicMetric.cs" />
+    <Compile Include="Core\IColumn.cs" />
+    <Compile Include="Core\IMetadata.cs" />
+    <Compile Include="Dq\IMetric.cs" />
+    <Compile Include="Core\IRow.cs" />
+    <Compile Include="Core\ITable.cs" />
+    <Compile Include="Core\Metadata.cs" />
+    <Compile Include="Core\Row.cs" />
+    <Compile Include="Core\Table.cs" />
+    <Compile Include="Core\TableExtensions.cs" />
+    <Compile Include="Dq\IMetricFunction.cs" />
+    <Compile Include="Query\ExpressionHelper.cs" />
+    <Compile Include="Query\IMetricFunction.cs" />
+    <Compile Include="Query\IProjection.cs" />
+    <Compile Include="Query\IQuery.cs" />
+    <Compile Include="Query\ISelectionCondition.cs" />
+    <Compile Include="Query\QueryExtensions.cs" />
+    <Compile Include="Statistics\NormalDist.cs" />
+    <Compile Include="Statistics\NormalDistExample.cs" />
+    <Compile Include="Simulate\SimulatedMetricFunctionInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Simulate\IHistogram.cs" />
+    <Compile Include="Simulate\SimulatedMetric.cs" />
+    <Compile Include="Simulate\SimulationBuilder.cs" />
+    <Compile Include="Statistics\Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{5B080C13-E1AC-4790-B404-3A980DAFC5EB}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
