@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DqMetricSimulator.Core
 {
-    public class Column<T> : IColumn
+    public class Column<T> : IColumn 
     {
         private readonly List<T> _data = new List<T>();
         
@@ -41,7 +42,7 @@ namespace DqMetricSimulator.Core
 
         int IColumn.BinarySearch(object o)
         {
-            return BinarySearch((T) o);
+            return BinarySearch((T) Convert.ChangeType(o, typeof(T)));
         }
 
         public string Name { get; set; }

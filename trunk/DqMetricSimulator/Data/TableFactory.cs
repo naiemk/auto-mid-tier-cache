@@ -42,8 +42,9 @@ namespace DqMetricSimulator.Data
 
         public static IColumn CreateColumn(Type dataType, IEnumerable<object> data)
         {
+            if (data == null) data = new List<object>();
             if (new[]{typeof(Int64), typeof(Int32), typeof(Int16), typeof(UInt16), typeof(UInt32), typeof(UInt64), typeof(int)}.Contains(dataType))
-                return new Column<Int64>( data.Cast<Int64>() );
+                return new Column<Int64>( data.Where(d => d!= null).Select(d => (Int64)Convert.ChangeType(d, typeof(Int64))) );
             if (dataType == typeof (DateTime))
                 return new Column<DateTime>(data.Cast<DateTime>());
             if (dataType == typeof (Double))

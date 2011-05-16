@@ -15,7 +15,7 @@ namespace AlgebraToSqlServer
     public class SimpleSqlDataService : IDataService 
     {
         public Dal Dal { get; private set; }
-        private const string ConnStr = "";
+        private readonly string _connStr = "";
         /// <summary>
         /// Runs a query aggainst database
         /// </summary>
@@ -28,13 +28,13 @@ namespace AlgebraToSqlServer
             //add columns
             sb.Append(query.Projections.SelectMany(p => p.Columns).Select(c => "[" + c + "]").JoinStrings(", "));
             sb.Append(" from ");
-            sb.Append(query.Sources.Select(c => "[" + c + "]").JoinStrings(", "));
+            sb.Append(query.Sources.Select(c => c).JoinStrings(", "));
             if (query.SelectionConditions.Count > 0)
             {
                 sb.Append(" where ");
                 sb.Append(query.SelectionConditions.Select(SelectionConditionToString).JoinStrings(" AND "));
             }
-            var dt  = Dal.GetDataTable(ConnStr, sb.ToString());
+            var dt  = Dal.GetDataTable(_connStr, sb.ToString());
             return ImportDataTable.ImportAdoNetDataTable(dt);
         }
 
@@ -91,7 +91,7 @@ namespace AlgebraToSqlServer
                 {
                     throw new NotSupportedException(String.Format("Expression {0} has more than 2 parameters which is not supported", sc.Expression));
                 }
-            return sb.ToString();
+            return sb.Replace("\"","'").ToString();
         }
 
         private static void Expect<T>(Expression exp) where T : class
@@ -119,10 +119,11 @@ namespace AlgebraToSqlServer
             return tbl;
         }
 
-        public SimpleSqlDataService()
+        public SimpleSqlDataService(string connStr)
         {
             var logger = new DebugLogger();
             Dal = new Dal(logger, new Progress(logger, 10));
+            _connStr = connStr;
         }
     }
 }
