@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using AlgebraToSqlServer;
 using AlgebraTree;
 using DqMetricSimulator.Core;
@@ -45,21 +46,23 @@ namespace Test
 
         [TestMethod]
         public void AddThreeQueries()
-        {
+        {   
+            //Run against AdventureWorksLite database.
             var q1 = new BasicQuery(
                 new[]
                     {
-                        ProjectionItem.CreateFromName<Int32>("Id", true),
-                        ProjectionItem.CreateFromName<String>("Name", false)
+                        ProjectionItem.CreateFromName<Int32>("ProductId", true),
+                        ProjectionItem.CreateFromName<String>("Name", false),
+                        ProjectionItem.CreateFromName<String>("Color", false)
                     },
                 new[]
                     {
-                        SelectionCondition.CreateFromLambda<string>(conferenceName => conferenceName == "VLDB")
+                        SelectionCondition.CreateFromLambda<string>(color => color == "Black")
                     },
-                new[] {"Sources"}
+                new[] {"SalesLT.Product"}
                 );
 
-            var ds = new SimpleSqlDataService();
+            var ds = new SimpleSqlDataService("Data Source=.; Initial Catalog=AdventureWorksLT2008; Integrated Security=SSPI");
             var qas = new SimpleQueryAnsweringService(ds);
             var cs = new NaiveCostService();
             var context = new SapmlingContext(qas, cs, ds);
@@ -67,7 +70,7 @@ namespace Test
 
             ITable qResult;
             var rv = context.ExecuteQuery(q1, out qResult);
-
+            
             Assert.IsNotNull(rv);
         }
 
@@ -84,7 +87,8 @@ namespace Test
                     {
                         SelectionCondition.CreateFromLambda<string>(conferenceName => conferenceName == "VLDB"),
                         SelectionCondition.CreateFromLambda<int>(year => year >= 2009),
-                        SelectionCondition.CreateFromLambda<int>(year => year <= 2009)
+                        SelectionCondition.CreateFromLambda<int>(year => year <= 2009),
+                        SelectionCondition.CreateFromLambda<int>(year => year == 2009)
                     },
                 new[] {"Sources"}
                 );
@@ -119,9 +123,58 @@ namespace Test
             Assert.IsTrue(q1.IsSubsetOf(q2));
             Assert.IsFalse(q2.IsSubsetOf(q1));
             Assert.IsTrue(q3.DoesIntersect(q2));
-            //Assert.IsTrue(q2.DoesIntersect(q3));
+            Assert.IsTrue(q2.DoesIntersect(q3));
             Assert.IsFalse(q1.DoesIntersect(q3));
             
+        }
+
+        [TestMethod]
+        public void TestSelectionConditions()
+        {
+            var s1 = SelectionCondition.CreateFromLambda<int>(year => year > 2008);
+            var s2 = SelectionCondition.CreateFromLambda<int>(year => year >= 2008);
+            var s3 = SelectionCondition.CreateFromLambda<int>(year => year < 2010);
+            var s4 = SelectionCondition.CreateFromLambda<int>(year => year <= 2010);
+            var s5 = SelectionCondition.CreateFromLambda<int>(year => year == 2009);
+            var s6 = SelectionCondition.CreateFromLambda<int>(year => year > 2009);
+            var s7 = SelectionCondition.CreateFromLambda<int>(year => year >= 2009);
+            var s8 = SelectionCondition.CreateFromLambda<int>(year => year < 2009);
+            var s9 = SelectionCondition.CreateFromLambda<int>(year => year <= 2009);
+
+            //Assert subset
+            Assert.IsTrue( s5.IsSubsetOf(s1)  );
+            Assert.IsTrue( s5.IsSubsetOf(s2)  );
+            Assert.IsTrue( s5.IsSubsetOf(s3)  );
+            Assert.IsTrue( s5.IsSubsetOf(s4)  );
+            Assert.IsFalse( s1.IsSubsetOf(s5) );
+            Assert.IsTrue( s1.IsSubsetOf(s2) );
+            Assert.IsFalse( s2.IsSubsetOf(s1) );
+            Assert.IsTrue( s6.IsSubsetOf(s1));
+            Assert.IsTrue( s7.IsSubsetOf(s1));
+            Assert.IsTrue(s6.IsSubsetOf(s2));
+            Assert.IsTrue(s7.IsSubsetOf(s2));
+            Assert.IsTrue(s8.IsSubsetOf(s3));
+            Assert.IsTrue(s9.IsSubsetOf(s3));
+            Assert.IsTrue(s8.IsSubsetOf(s4));
+            Assert.IsTrue(s9.IsSubsetOf(s4));
+
+            //Assert intersect
+            Assert.IsTrue(s1.DoesIntersect(s2));
+            Assert.IsTrue(s2.DoesIntersect(s1));
+            Assert.IsTrue(s3.DoesIntersect(s1));
+            Assert.IsTrue(s4.DoesIntersect(s1));
+            Assert.IsTrue(s3.DoesIntersect(s2));
+            Assert.IsTrue(s4.DoesIntersect(s2));
+            Assert.IsTrue(s5.DoesIntersect(s1));
+            Assert.IsTrue(s5.DoesIntersect(s2));
+            Assert.IsTrue(s5.DoesIntersect(s3));
+            Assert.IsTrue(s5.DoesIntersect(s4));
+            Assert.IsTrue(s5.DoesIntersect(s1));
+            Assert.IsTrue(s2.DoesIntersect(s7));
+            Assert.IsTrue(s7.DoesIntersect(s9));
+            Assert.IsTrue(s9.DoesIntersect(s7));
+            Assert.IsFalse(s6.DoesIntersect(s8));
+            Assert.IsFalse(s8.DoesIntersect(s6));
         }
     }
 }
