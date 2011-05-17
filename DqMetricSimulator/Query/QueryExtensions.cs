@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using DqMetricSimulator.Dq;
 
 namespace DqMetricSimulator.Query
 {
