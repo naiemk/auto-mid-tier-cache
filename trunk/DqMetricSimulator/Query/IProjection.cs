@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using DqMetricSimulator.Dq;
 
 namespace DqMetricSimulator.Query
 {
@@ -34,6 +35,18 @@ namespace DqMetricSimulator.Query
                 new HashSet<string>(new[] {colName}),
                 (Expression<Func<TIn, TIn>>)(c => c),
                 isKey
+                );
+        }
+
+        internal static Func<string, bool> GenericIsGood =  p => true;
+
+        public static IProjection CreateFromMetric(string metricName, string parameter)
+        {
+            //A metric projection is actually call to a DQService Method.
+            return new ProjectionItem(
+                new HashSet<string>(new[] {parameter}),
+                Expression.Call(typeof(IDqService), metricName, new[] { typeof(string) }, Expression.Parameter(typeof(string), parameter)),
+                false
                 );
         }
     }

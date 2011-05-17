@@ -2,6 +2,7 @@
 using System.Linq;
 using DqMetricSimulator.Core;
 using DqMetricSimulator.Data;
+using DqMetricSimulator.Dq;
 using DqMetricSimulator.Query;
 
 namespace AlgebraTree
@@ -11,6 +12,7 @@ namespace AlgebraTree
         private readonly IQueryAnsweringService _queryAnsweringService;
         private readonly ICostService _costService;
         private readonly IDataService _dataServicea;
+        private readonly IDqService _dqService;
         public QueryTree Tree { get; private set; }
         public float ConfidenceThreshold { get; set; }
         public float SamplingRate { get; set; }
@@ -20,11 +22,12 @@ namespace AlgebraTree
             Tree = QueryTree.CreateEmptyTree();
         }
 
-        public SapmlingContext(IQueryAnsweringService queryAnsweringService, ICostService costService, IDataService dataServicea)
+        public SapmlingContext(IQueryAnsweringService queryAnsweringService, ICostService costService, IDataService dataServicea, IDqService dqService)
         {
             _queryAnsweringService = queryAnsweringService;
             _costService = costService;
             _dataServicea = dataServicea;
+            _dqService = dqService;
         }
 
         /// <summary>
@@ -96,8 +99,10 @@ namespace AlgebraTree
                 //Result is too small to sample. Re generate the skip rate
                 skiprate = result.Rows.Count/5;
             }
+            if (skiprate == 0)
+                skiprate = 1;
             int ii;
-            var sampleResult = TableFactory.CreateTable(result);
+            var sampleResult = sample.Sample.Table;//TableFactory.CreateTable(result);
             result.Rows.Select((r,i) => new {r,i}).Where(x => Math.DivRem(x.i, skiprate, out ii) == 0).Select(r => r.r)
                 .ToList()
                 .ForEach(r => sampleResult.Rows.Add(r) );
@@ -105,6 +110,8 @@ namespace AlgebraTree
             if (_costService.CanMaterialize(sample, query, result))
             {
                 //Update metric functions
+                _dqService.UpdateMetricFunctions(query, sampleResult);
+                sample.Sample.Materialize();
             }
         }
 

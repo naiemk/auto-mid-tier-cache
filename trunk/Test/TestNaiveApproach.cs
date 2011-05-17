@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using AlgebraToSqlServer;
 using AlgebraTree;
 using DqMetricSimulator.Core;
+using DqMetricSimulator.Dq;
 using DqMetricSimulator.Query;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -65,13 +65,35 @@ namespace Test
             var ds = new SimpleSqlDataService("Data Source=.; Initial Catalog=AdventureWorksLT2008; Integrated Security=SSPI");
             var qas = new SimpleQueryAnsweringService(ds);
             var cs = new NaiveCostService();
-            var context = new SapmlingContext(qas, cs, ds);
+            var dqs = new SuperSimpleDqService();
+            var context = new SapmlingContext(qas, cs, ds, dqs);
             context.Initialize();
 
             ITable qResult;
             var rv = context.ExecuteQuery(q1, out qResult);
             
-            Assert.IsNotNull(rv);
+            Assert.IsNull(rv);
+
+            var q2 = new BasicQuery(
+                new[]
+                    {
+                        ProjectionItem.CreateFromName<Int32>("ProductId", true),
+                        ProjectionItem.CreateFromName<String>("Name", false),
+                        ProjectionItem.CreateFromName<String>("Color", false),
+                        ProjectionItem.CreateFromMetric("m_Completeness", "ProcuctId")
+                    },
+                new[]
+                    {
+                        SelectionCondition.CreateFromLambda<string>(color => color == "Black"),
+                        SelectionCondition.CreateFromLambda<string>(productNumber => productNumber == "HL-U509")
+                    },
+                new[] {"SalesLT.Product"}
+                );
+
+            //The result should be from sample.
+            ITable q2Result;
+            var rv2 = context.ExecuteQuery(q2, out q2Result);
+            Assert.IsNotNull(rv2);
         }
 
         [TestMethod]
