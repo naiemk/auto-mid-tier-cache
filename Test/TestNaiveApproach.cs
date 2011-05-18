@@ -80,7 +80,7 @@ namespace Test
                         ProjectionItem.CreateFromName<Int32>("ProductId", true),
                         ProjectionItem.CreateFromName<String>("Name", false),
                         ProjectionItem.CreateFromName<String>("Color", false),
-                        ProjectionItem.CreateFromMetric("m_Completeness", "ProcuctId")
+                        ProjectionItem.CreateFromBasicMetric("m_Completeness", "ProcuctId")
                     },
                 new[]
                     {

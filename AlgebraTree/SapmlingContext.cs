@@ -16,6 +16,9 @@ namespace AlgebraTree
         public QueryTree Tree { get; private set; }
         public float ConfidenceThreshold { get; set; }
         public float SamplingRate { get; set; }
+        public Action<IQuery> PreQueryRunEvent { get; set; }
+        public Action<IQuery> PostQueryRunEvent = (q) => { };
+        public Action<IQuery, ISample> SampleMaterialzied = (q, s) => { };
         
         public void Initialize()
         {
@@ -41,7 +44,9 @@ namespace AlgebraTree
             //2.Find the appropriate node to hold the sample.
             //3.Create a blank sample.
             //4.Create a node for the sample and put it in the tree. Return the sample.
+            PreQueryRunEvent(query);
             estimationResult  = EstimateFromSamples(query);
+            PostQueryRunEvent(query);
             if (estimationResult != null && estimationResult.Confidence >= ConfidenceThreshold)
                 return null; //No new sample is created
             
@@ -123,6 +128,7 @@ namespace AlgebraTree
             if (addedNode != null)
             {
                 MaterializeSampleFromQuery(addedNode, query, result);
+                SampleMaterialzied(query, addedNode.Sample);
             }
             return rv;
         }
