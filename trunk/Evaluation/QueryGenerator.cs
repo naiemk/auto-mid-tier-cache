@@ -28,21 +28,27 @@ namespace Evaluation
                         ProjectionItem.CreateFromName<Int32>("ProductId", true),
                         ProjectionItem.CreateFromName<String>("Name", false),
                         ProjectionItem.CreateFromName<String>("Color", false),
-                        ProjectionItem.CreateFromMetric("m_Completeness", "Name"),
-                        ProjectionItem.CreateFromMetric("m_Correctness", "Color")
+                        ProjectionItem.CreateFromBasicMetric("m_Completeness", "Name"),
+                        ProjectionItem.CreateFromBasicMetric("m_Correctness", "Color")
                     },
-                conds,
-                new[] {"SaleLT.Product"}
+                conds.SelectMany(c => c is RangeSelection?new[]{ ((RangeSelection)c).R1, ((RangeSelection)c).R2 }:new[]
+                                                                                                                      {
+                                                                                                                          c
+                                                                                                                      } ),
+                new[] {"SalesLT.Product"}
                 );
             return rv;
         }
 
         public QueryGenerator Range<T>(Expression<Func<T, bool>> e1, Expression<Func<T, bool>> e2)
         {
+            var temp = new RangeSelection()
+                           {
+                               R1 = SelectionCondition.CreateFromLambda(e1),
+                               R2 = SelectionCondition.CreateFromLambda(e2),
+                           };
             Conds.Add(new Tuple<string, ISelectionCondition>(e1.Parameters[0].ToString(),
-                                                             SelectionCondition.CreateFromLambda(e1)));
-            Conds.Add(new Tuple<string, ISelectionCondition>(e1.Parameters[0].ToString(),
-                                                             SelectionCondition.CreateFromLambda(e2)));
+                                                             temp));
             return this;
         }
 
@@ -53,5 +59,27 @@ namespace Evaluation
             return this;
         }
 
+    }
+
+    //This 
+    internal class RangeSelection : ISelectionCondition
+    {
+        public Expression Expression
+        {
+            get { return null; }
+        }
+
+        public HashSet<ParameterExpression> Parameters
+        {
+            get { return null; }
+        }
+
+        public Delegate CompiledExpression
+        {
+            get { return null; }
+        }
+
+        public ISelectionCondition R1;
+        public ISelectionCondition R2;
     }
 }

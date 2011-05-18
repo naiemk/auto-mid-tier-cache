@@ -64,8 +64,14 @@ namespace AlgebraToSqlServer
                     case ExpressionType.GreaterThanOrEqual :
                         sb.AppendFormat("{0} <= {1}", firstPar, eqex.Left is ParameterExpression ? eqex.Right : eqex.Left);
                         break;
+                    case ExpressionType.GreaterThan :
+                        sb.AppendFormat("{0} > {1}", firstPar, eqex.Left is ParameterExpression ? eqex.Right : eqex.Left);
+                        break;
                     case ExpressionType.LessThanOrEqual :
                         sb.AppendFormat("{0} >= {1}", firstPar, eqex.Left is ParameterExpression ? eqex.Right : eqex.Left);
+                        break;
+                    case ExpressionType.LessThan :
+                        sb.AppendFormat("{0} < {1}", firstPar, eqex.Left is ParameterExpression ? eqex.Right : eqex.Left);
                         break;
                     default:
                         throw new NotSupportedException(String.Format("Expression '{0}' not supported.", exp));
