@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicCostService.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="EstimationResult.cs" />
     <Compile Include="ICostService.cs" />

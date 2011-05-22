@@ -13,6 +13,27 @@ namespace Evaluation
     class DblpSamples
     {
 
+        private static IEnumerable<IQuery> RangesForNaiveDblp()
+        {
+            var ranges = new QueryGenerator()
+                .Range<Int32>(paperId => paperId > 10, paperId => paperId < 150)
+                .Range<Int32>(paperId => paperId > 150, paperId => paperId < 250)
+                .Range<Int32>(paperId => paperId > 50, paperId => paperId < 100)
+                .Range<Int32>(paperId => paperId > 10, paperId => paperId < 50)
+                .Range<Int32>(paperId => paperId > 150, paperId => paperId < 200)
+                .Range<Int32>(paperId => paperId > 250, paperId => paperId < 300)
+                .Range<Int32>(conferenceId => conferenceId > 100, conferenceId => conferenceId < 200)
+                .Range<Int32>(conferenceId => conferenceId > 200, conferenceId => conferenceId < 300)
+                .Range<Int32>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 400)
+                .Range<Int32>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 350)
+                ;
+
+            var queries1 = GetAllQueries(ranges.Conds, "paperId");
+            var queries2 = GetAllQueries(ranges.Conds, "conferenceId");
+
+            return queries1;
+        }
+
         private static IEnumerable<IQuery> RangesForNaive()
         {
             //Ranges
