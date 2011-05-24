@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using Common;
 using DqMetricSimulator.Core;
 using DqMetricSimulator.Query;
@@ -57,6 +58,19 @@ namespace DqMetricSimulator.Data
             if (data == null)
                 return CreateColumn(dc.DataType, new List<Object>()).Set(c => c.Name = dc.ColumnName);
             return CreateColumn(dc.DataType, data).Set(c => c.Name = dc.ColumnName);
+        }
+
+        /// <summary>
+        /// Creates a column from base column. Filter is a list of ints that represents indexes of data in col
+        /// </summary>
+        public static IColumn CreateColumn(IColumn baseCol, IEnumerable<int> filter)
+        {
+            if (filter == null)
+                throw new ArgumentNullException("filter");
+            if (!baseCol.GetType().IsGenericType)
+                throw new InvalidOperationException("Passed IColumn is not of type Column<T>");
+            var colType = baseCol.GetType().GetGenericArguments()[0];
+            return CreateColumn(colType, filter.Select(i => baseCol[i]).OrderBy(i => i)).Set(c => c.Name = baseCol.Name);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Common;
 using DqMetricSimulator.Core;
 using DqMetricSimulator.Data;
 using DqMetricSimulator.Dq;
@@ -47,14 +48,16 @@ namespace AlgebraTree
             PreQueryRunEvent(query);
             estimationResult  = EstimateFromSamples(query);
             PostQueryRunEvent(query);
-            if (estimationResult != null && estimationResult.Confidence >= ConfidenceThreshold)
+            if (estimationResult.IfNotNull(er => er.Confidence) < ConfidenceThreshold)
+                estimationResult = null;
+            if (estimationResult != null)
                 return null; //No new sample is created
             
             var parentNode = FindParentNode(Tree, query);
             var newSample = new Sample(TableFactory.CreateTable(query),
                                        false);
             //TODO: When inserting a node, all possible childrens should be detected and moved under the new node
-            var newNode = new QueryNode(parentNode, query, Popularity.Unknown, newSample);
+            var newNode = new QueryNode(parentNode, query, new Popularity(1, 1), newSample);
             parentNode.Childs.Add(newNode);
 
             return newNode;
@@ -96,7 +99,7 @@ namespace AlgebraTree
 
         }
 
-        public void MaterializeSampleFromQuery(IQueryNode sample, IQuery query, ITable result)
+        public bool MaterializeSampleFromQuery(IQueryNode sample, IQuery query, ITable result)
         {
             var skiprate = (int) (result.Rows.Count*SamplingRate);
             if (skiprate==0 || (skiprate * 5 > result.Rows.Count ))
@@ -104,20 +107,22 @@ namespace AlgebraTree
                 //Result is too small to sample. Re generate the skip rate
                 skiprate = result.Rows.Count/5;
             }
-            if (skiprate == 0)
-                skiprate = 1;
             int ii;
             var sampleResult = sample.Sample.Table;//TableFactory.CreateTable(result);
-            result.Rows.Select((r,i) => new {r,i}).Where(x => Math.DivRem(x.i, skiprate, out ii) == 0).Select(r => r.r)
-                .ToList()
-                .ForEach(r => sampleResult.Rows.Add(r) );
+            var filter = result.Rows.Select((r,i) => new {r,i}).Where(x => skiprate == 0 || Math.DivRem(x.i, skiprate, out ii) == 0).Select(r => r.r)
+                .ToList();
+
+            sampleResult.FillFromFilter(result, filter);
+
             //Use cost model. Check if can materialize.
             if (_costService.CanMaterialize(sample, query, result))
             {
                 //Update metric functions
                 _dqService.UpdateMetricFunctions(query, sampleResult);
                 sample.Sample.Materialize();
+                return true;
             }
+            return false;
         }
 
         public EstimationResult ExecuteQuery(IQuery query, out ITable result)
@@ -127,8 +132,8 @@ namespace AlgebraTree
             result =  _dataServicea.RunQuery(query);
             if (addedNode != null)
             {
-                MaterializeSampleFromQuery(addedNode, query, result);
-                SampleMaterialzied(query, addedNode.Sample);
+                if (MaterializeSampleFromQuery(addedNode, query, result))
+                    SampleMaterialzied(query, addedNode.Sample);
             }
             return rv;
         }

@@ -64,7 +64,7 @@ namespace Test
 
             var ds = new SimpleSqlDataService("Data Source=.; Initial Catalog=AdventureWorksLT2008; Integrated Security=SSPI");
             var qas = new SimpleQueryAnsweringService(ds);
-            var cs = new NaiveCostService();
+            var cs = new NaiveCostService(100, 100);
             var dqs = new SuperSimpleDqService();
             var context = new SapmlingContext(qas, cs, ds, dqs);
             context.Initialize();
