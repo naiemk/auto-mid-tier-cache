@@ -54,6 +54,10 @@
     <Compile Include="SapmlingContext.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{5B080C13-E1AC-4790-B404-3A980DAFC5EB}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DqMetricSimulator\DqMetricSimulator.csproj">
       <Project>{79E206D8-CADC-44E7-A6C8-38CDF1451E0A}</Project>
       <Name>DqMetricSimulator</Name>

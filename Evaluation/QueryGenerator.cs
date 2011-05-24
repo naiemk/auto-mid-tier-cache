@@ -15,27 +15,31 @@ namespace Evaluation
         public void Initialize()
         {
             //Set the template for each query.
+            Projections = new[]
+                {
+                    ProjectionItem.CreateFromName<Int32>("ProductId", true),
+                    ProjectionItem.CreateFromName<String>("Name", false),
+                    ProjectionItem.CreateFromName<String>("Color", false),
+                    ProjectionItem.CreateFromBasicMetric("m_Completeness", "Name"),
+                    ProjectionItem.CreateFromBasicMetric("m_Correctness", "Color")
+                }.ToList();
 
         }
 
         public List<Tuple<String, ISelectionCondition>> Conds = new List<Tuple<String,ISelectionCondition>>();
 
-        public static IQuery GetQuery(IEnumerable<ISelectionCondition> conds)
+        public List<IProjection> Projections { get; set; }
+        public String Table { get; set; }
+
+        public IQuery GetQuery(IEnumerable<ISelectionCondition> conds)
         {
             var rv = new BasicQuery(
-                new[]
-                    {
-                        ProjectionItem.CreateFromName<Int32>("ProductId", true),
-                        ProjectionItem.CreateFromName<String>("Name", false),
-                        ProjectionItem.CreateFromName<String>("Color", false),
-                        ProjectionItem.CreateFromBasicMetric("m_Completeness", "Name"),
-                        ProjectionItem.CreateFromBasicMetric("m_Correctness", "Color")
-                    },
+                    Projections,
                 conds.SelectMany(c => c is RangeSelection?new[]{ ((RangeSelection)c).R1, ((RangeSelection)c).R2 }:new[]
                                                                                                                       {
                                                                                                                           c
                                                                                                                       } ),
-                new[] {"SalesLT.Product"}
+                new[] {Table}
                 );
             return rv;
         }

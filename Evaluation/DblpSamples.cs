@@ -13,28 +13,41 @@ namespace Evaluation
     class DblpSamples
     {
 
-        private static IEnumerable<IQuery> RangesForNaiveDblp()
+        public static IEnumerable<IQuery> RangesForNaiveDblp()
         {
             var ranges = new QueryGenerator()
-                .Range<Int32>(paperId => paperId > 10, paperId => paperId < 150)
-                .Range<Int32>(paperId => paperId > 150, paperId => paperId < 250)
-                .Range<Int32>(paperId => paperId > 50, paperId => paperId < 100)
-                .Range<Int32>(paperId => paperId > 10, paperId => paperId < 50)
-                .Range<Int32>(paperId => paperId > 150, paperId => paperId < 200)
-                .Range<Int32>(paperId => paperId > 250, paperId => paperId < 300)
-                .Range<Int32>(conferenceId => conferenceId > 100, conferenceId => conferenceId < 200)
-                .Range<Int32>(conferenceId => conferenceId > 200, conferenceId => conferenceId < 300)
-                .Range<Int32>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 400)
-                .Range<Int32>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 350)
+                .Range<Int64>(paperId => paperId > 10, paperId => paperId < 550)
+                .Range<Int64>(paperId => paperId > 10, paperId => paperId < 150)
+                .Range<Int64>(paperId => paperId > 50, paperId => paperId < 100)
+                .Range<Int64>(paperId => paperId > 10, paperId => paperId < 50)
+                .Range<Int64>(paperId => paperId > 550, paperId => paperId < 600)
+                .Range<Int64>(paperId => paperId > 1050, paperId => paperId < 1550)
+                .Range<Int64>(paperId => paperId > 1, paperId => paperId < 5)
+                .Range<Int64>(conferenceId => conferenceId > 100, conferenceId => conferenceId < 200)
+                .Range<Int64>(conferenceId => conferenceId > 200, conferenceId => conferenceId < 300)
+                .Range<Int64>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 400)
+                .Range<Int64>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 350)
                 ;
 
-            var queries1 = GetAllQueries(ranges.Conds, "paperId");
-            var queries2 = GetAllQueries(ranges.Conds, "conferenceId");
+            ranges.
+            Projections = new[]
+                {
+                    ProjectionItem.CreateFromName<Int64>("PaperId", true),
+                    ProjectionItem.CreateFromName<Int64>("ConferenceId", false),
+                    ProjectionItem.CreateFromName<String>("Paper", false),
+                    ProjectionItem.CreateFromName<String>("Proceeding", false),
+                    ProjectionItem.CreateFromBasicMetric("m_Completeness", "Paper"),
+                    ProjectionItem.CreateFromBasicMetric("m_Correctness", "Paper")
+                }.ToList();
+            ranges.Table = "Temp_PaperConferences";
+
+            var queries1 = GetAllQueries(ranges, ranges.Conds, "paperId");
+            var queries2 = GetAllQueries(ranges, ranges.Conds, "conferenceId");
 
             return queries1;
         }
 
-        private static IEnumerable<IQuery> RangesForNaive()
+        public static IEnumerable<IQuery> RangesForNaiveAw()
         {
             //Ranges
             var ranges = new QueryGenerator()
@@ -60,59 +73,76 @@ namespace Evaluation
             //Merge lists.
             var merged = MergeLists(ranges, consts, 0.7);
 
-            var queries = GetAllQueries(merged, "productId", "color");
+            var queries = GetAllQueries(ranges, merged, "productId", "color");
             return queries;
 
         }
 
 
-        public static void ExecuteTestForNaiveApproach(String fileName)
+        public static string ExecuteTestForNaiveApproach(string connStr, IEnumerable<IQuery> queries, float confThresh, long queryLimit, long memLimit, bool includeHeader)
         {
             //Now enter queries into system and run them all.
-            var queries = RangesForNaive();
-            var toOut = RunTest(queries, 0.7);
-            System.IO.File.WriteAllText(fileName, toOut);
+            return RunTestNaive(queries, confThresh, connStr, queryLimit, memLimit, includeHeader);
         }
 
-
-        private static string RunTest(IEnumerable<IQuery> queries, double confidenceThreshold)
+        public static string RunTestBasic(IEnumerable<IQuery> queries, float confidenceThreshold, String connStr, long queryLimit, long memLimit, bool includeHeader)
         {
-            var ds = new SimpleSqlDataService("Data Source=.; Initial Catalog=AdventureWorksLT2008; Integrated Security=SSPI");
+            var ds = new SimpleSqlDataService(connStr);
             var qas = new SimpleQueryAnsweringService(ds);
-            var cs = new NaiveCostService();
+            var cs = new BasicCostService(queryLimit, memLimit, queries.Count(), 64);
             var dqs = new SuperSimpleDqService();
-            var context = new SapmlingContext(qas, cs, ds, dqs);
+            var context = new SapmlingContext(qas, cs, ds, dqs) {SamplingRate = 0.05f, ConfidenceThreshold = confidenceThreshold};
+            return RunTest(context, queries, queryLimit, memLimit, includeHeader);
+        }
+
+        private static string RunTestNaive(IEnumerable<IQuery> queries, float confidenceThreshold, String connStr, long queryLimit, long memLimit, bool includeHeader)
+        {
+            var ds = new SimpleSqlDataService(connStr);
+            var qas = new SimpleQueryAnsweringService(ds);
+            var cs = new NaiveCostService(memLimit, queryLimit);
+            var dqs = new SuperSimpleDqService();
+            var context = new SapmlingContext(qas, cs, ds, dqs) {SamplingRate = 0.05f, ConfidenceThreshold = confidenceThreshold};
+            return RunTest(context, queries, queryLimit, memLimit, includeHeader);
+        }
+
+        private static string RunTest(SapmlingContext context, IEnumerable<IQuery> queries, long queryLimit, long memLimit, bool includeHeader)
+        {
             context.Initialize();
             var outputRes = new StringBuilder();
-            outputRes.AppendLine("Q#, TimeTotal, SampleSize, QueryFromSample, ConfidenceThreshold");
+            if (includeHeader) outputRes.AppendLine("Q#, TimeTotal, SampleCount, SampleSize, QueryFromSample, ConfidenceThreshold, maxQ, memLimit");
             var qNumber = 0;
             var timeTotal = default(long);
             var sampleSize = 0;
+            var sampleCount = 0;
             var queryFromSample = 0;
+            var pre = new DateTime();
+            var ts=new TimeSpan();
+            context.PreQueryRunEvent = q => { ts = DateTime.Now - pre; };
+            context.PostQueryRunEvent = q => { pre = DateTime.Now; };
+            context.SampleMaterialzied = (q, sample) =>
+                                             {
+                                                 sampleCount++; sampleSize += sample.Table.Rows.Count; };
             foreach (var query in queries)
             {
                 ITable result;
-                var pre = DateTime.Now;
-                var ts = TimeSpan.MinValue;
-                context.PreQueryRunEvent = q => { ts = DateTime.Now - pre; };
-                context.PostQueryRunEvent = q => { pre = DateTime.Now; };
-                context.SampleMaterialzied = (q, sample) => { sampleSize += sample.Table.Rows.Count; };
+                pre = DateTime.Now;
                 
                 var est = context.ExecuteQuery(query, out result);
                 qNumber++;
                 timeTotal += ts.Ticks;
-                if (est != null && est.Confidence > confidenceThreshold)
+                if (est != null && est.Confidence > context.ConfidenceThreshold)
                     queryFromSample++;
             }
 
-            outputRes.AppendFormat("{0},{1},{2},{3},{4}", qNumber, timeTotal, sampleSize, queryFromSample,
-                                   confidenceThreshold);
+            outputRes.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7}", qNumber, timeTotal, sampleCount, sampleSize, queryFromSample,
+                                   context.ConfidenceThreshold, queryLimit, memLimit );
             outputRes.AppendLine();
 
             //Keep record of expenses: Qid, TimeToExecute
             //Keep record of size: Qid, SampleSize and creation costs if new sample materialzied.
             //Graph out above numbers.
             return outputRes.ToString();
+            
         }
 
         private static IEnumerable<Tuple<string, ISelectionCondition>> MergeLists(QueryGenerator ranges, QueryGenerator consts, double rate)
@@ -124,11 +154,11 @@ namespace Evaluation
             return rv;
         }
 
-        private static IEnumerable<IQuery> GetAllQueries(IEnumerable<Tuple<string, ISelectionCondition>> reference, params string[] columns)
+        private static IEnumerable<IQuery> GetAllQueries(QueryGenerator qg, IEnumerable<Tuple<string, ISelectionCondition>> reference, params string[] columns)
         {
             var allConds = GetAllConditions(reference, null, 0, columns);
             var allCondsOrdered = allConds.OrderBy(a => a.Count);
-            return allCondsOrdered.Select(QueryGenerator.GetQuery).ToList();
+            return allCondsOrdered.Select(qg.GetQuery).ToList();
         }
 
         private static List<List<ISelectionCondition>> GetAllConditions(IEnumerable<Tuple<string, ISelectionCondition>> reference, 

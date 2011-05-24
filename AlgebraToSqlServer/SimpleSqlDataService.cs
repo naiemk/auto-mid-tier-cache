@@ -115,15 +115,16 @@ namespace AlgebraToSqlServer
             //Query.condition can be assessed with passing 
             var rv = node.Sample.Table.Rows.Where(
                     //Query condition
-                    r => query.SelectionConditions.All(c => (bool)c.CompiledExpression.Method.Invoke(c, 
+                    r => query.SelectionConditions.All(c => (bool)c.CompiledExpression.DynamicInvoke( 
                             //Extract parameter values
                             c.Parameters.Select(p => node.Sample.Table.GetValueByColumn(p.Name, r)).ToArray())
                             )
-                        ).Select(r => r);
-            var tbl = TableFactory.CreateTable(query.SelectionConditions.Count, query.GetKeyColumnsIds());
-            //TODO:Fill in the table
+                        ).Select(r => r).ToList();
+            var tbl = TableFactory.CreateTable(query.Projections.Count, query.GetKeyColumnsIds());
+            tbl.FillFromFilter(node.Sample.Table, rv);
             return tbl;
         }
+
 
         public SimpleSqlDataService(string connStr)
         {
