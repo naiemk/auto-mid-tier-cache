@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Common.Linq;
 
 namespace DqMetricSimulator.Query
 {
@@ -42,7 +43,7 @@ namespace DqMetricSimulator.Query
         public SelectionCondition(HashSet<ParameterExpression> parameters, Expression expression)
         {
             _parameters = parameters;
-            _expression = expression;
+            _expression = Evaluator.PartialEval(expression);
         }
 
         public static ISelectionCondition CreateFromLambda<T>(Expression<Func<T, bool>> e)
