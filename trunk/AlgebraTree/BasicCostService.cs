@@ -28,7 +28,7 @@ namespace AlgebraTree
             _maxSizeOfSamples = maxSizeOfSamples;
         }
 
-        public bool CanMaterialize(IQueryNode sample, IQuery query, ITable result)
+        public bool CanMaterialize(IQueryNode sample, IQuery query)
         {
             //Return if can materialize the sample based on its popularity considering
             //memory, and bandwith limitations.

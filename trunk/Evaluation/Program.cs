@@ -13,11 +13,13 @@ namespace Evaluation
             const string connStr2 = "Data Source=.; Initial Catalog=DBLP; Integrated Security=SSPI";
             var toOut = new StringBuilder();
             //Mem limit is the limitation of memory
-            var maxMem = 27;
+            var maxMem = 800;
             //Query limit is the limitation of call to Dq Service
             var maxQ = 60;
             var isFirst = true;
-            for (maxMem = 30; maxMem < 1000; maxMem+=30)
+            var confedence = 0.6f;
+            //for (maxMem = 30; maxMem < 1000; maxMem+=30)
+            for (confedence = 1; confedence > 0; confedence -= 0.1f)
             {
                 //if (args[0] == "-naive-aw")
                 //{
@@ -29,7 +31,7 @@ namespace Evaluation
                     //Run with different max mem and maxQ and write back # of queries answered from sample per all queries.
                     toOut.Append(
                         DblpSamples.ExecuteTestForNaiveApproach(connStr2, DblpSamples.RangesForNaiveDblp(),
-                                                                1.5f,
+                                                                confedence,
                                                                 maxQ,
                                                                 maxMem, isFirst)
                         );
@@ -39,7 +41,7 @@ namespace Evaluation
                     //Run with different max mem and maxQ and write back # of queries answered from sample per all queries.
                     toOut.Append(
                         DblpSamples.RunTestBasic( DblpSamples.RangesForNaiveDblp(),
-                                                                0.6f,
+                                                                confedence,
                                                                 connStr2,
                                                                 maxQ,
                                                                 maxMem, isFirst)

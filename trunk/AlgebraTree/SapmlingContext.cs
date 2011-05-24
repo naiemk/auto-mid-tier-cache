@@ -115,7 +115,7 @@ namespace AlgebraTree
             sampleResult.FillFromFilter(result, filter);
 
             //Use cost model. Check if can materialize.
-            if (_costService.CanMaterialize(sample, query, result))
+            if (_costService.CanMaterialize(sample, query))
             {
                 //Update metric functions
                 _dqService.UpdateMetricFunctions(query, sampleResult);

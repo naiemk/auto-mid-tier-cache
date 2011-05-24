@@ -10,19 +10,60 @@ using DqMetricSimulator.Query;
 
 namespace Evaluation
 {
+
+    public static class MyAddons
+    {
+        public static QueryGenerator PaperIdRange(this QueryGenerator qg, int start, int len)
+        {
+            var sl = start + len;
+            return qg.Range<Int64>(paperId => paperId > start, paperId => paperId < sl);
+        }
+    }
+
     class DblpSamples
     {
 
         public static IEnumerable<IQuery> RangesForNaiveDblp()
         {
             var ranges = new QueryGenerator()
-                .Range<Int64>(paperId => paperId > 10, paperId => paperId < 550)
-                .Range<Int64>(paperId => paperId > 10, paperId => paperId < 150)
-                .Range<Int64>(paperId => paperId > 50, paperId => paperId < 100)
-                .Range<Int64>(paperId => paperId > 10, paperId => paperId < 50)
-                .Range<Int64>(paperId => paperId > 550, paperId => paperId < 600)
-                .Range<Int64>(paperId => paperId > 1050, paperId => paperId < 1550)
-                .Range<Int64>(paperId => paperId > 1, paperId => paperId < 5)
+                .PaperIdRange(0, 6000)
+                .PaperIdRange(0, 1000)
+                .PaperIdRange(1000, 1000)
+                .PaperIdRange(2000, 1000)
+                .PaperIdRange(0, 500)
+                .PaperIdRange(500, 500)
+                .PaperIdRange(1000, 500)
+                .PaperIdRange(1500, 500)
+                .PaperIdRange(2000, 500)
+                .PaperIdRange(2500, 500)
+                .PaperIdRange(3000, 500)
+                .PaperIdRange(0, 100)
+                .PaperIdRange(100, 100)
+                .PaperIdRange(200, 100)
+                .PaperIdRange(300, 100)
+                .PaperIdRange(400, 100)
+                .PaperIdRange(500, 100)
+                .PaperIdRange(600, 100)
+                .PaperIdRange(700, 100)
+                .PaperIdRange(800, 100)
+                .PaperIdRange(900, 100)
+                .PaperIdRange(1000, 100)
+                .PaperIdRange(1100, 100)
+                .PaperIdRange(1200, 100)
+                .PaperIdRange(1300, 100)
+                .PaperIdRange(1400, 100)
+                .PaperIdRange(1500, 100)
+                .PaperIdRange(1600, 100)
+                .PaperIdRange(1700, 100)
+                .PaperIdRange(1800, 100)
+                .PaperIdRange(1900, 100)
+                .PaperIdRange(1000, 20)
+                .PaperIdRange(1040, 20)
+                .PaperIdRange(1080, 20)
+                .PaperIdRange(1100, 20)
+                .PaperIdRange(1140, 20)
+                .PaperIdRange(1180, 20)
+                .PaperIdRange(1200, 20)
                 .Range<Int64>(conferenceId => conferenceId > 100, conferenceId => conferenceId < 200)
                 .Range<Int64>(conferenceId => conferenceId > 200, conferenceId => conferenceId < 300)
                 .Range<Int64>(conferenceId => conferenceId > 300, conferenceId => conferenceId < 400)
@@ -89,7 +130,7 @@ namespace Evaluation
         {
             var ds = new SimpleSqlDataService(connStr);
             var qas = new SimpleQueryAnsweringService(ds);
-            var cs = new BasicCostService(queryLimit, memLimit, queries.Count(), 64);
+            var cs = new BasicCostService(queryLimit, memLimit, queries.Count(), 720);
             var dqs = new SuperSimpleDqService();
             var context = new SapmlingContext(qas, cs, ds, dqs) {SamplingRate = 0.05f, ConfidenceThreshold = confidenceThreshold};
             return RunTest(context, queries, queryLimit, memLimit, includeHeader);

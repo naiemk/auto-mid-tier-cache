@@ -5,7 +5,7 @@ namespace AlgebraTree
 {
     public interface ICostService
     {
-        bool CanMaterialize(IQueryNode sample, IQuery query, ITable result);
+        bool CanMaterialize(IQueryNode sample, IQuery queryt);
     }
 
     public class NaiveCostService : ICostService
@@ -15,7 +15,7 @@ namespace AlgebraTree
         private int _queriesSoFar;
         private long _sizeSoFar;
 
-        public bool CanMaterialize(IQueryNode sample, IQuery query, ITable result)
+        public bool CanMaterialize(IQueryNode sample, IQuery query)
         {
             _queriesSoFar += 1;
             _sizeSoFar += sample.Sample.Table.Rows.Count;
