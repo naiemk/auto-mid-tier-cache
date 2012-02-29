@@ -57,7 +57,7 @@ namespace Test
                     },
                 new[]
                     {
-                        SelectionCondition.CreateFromLambda<string>(color => color == "Black")
+                        SelectionCondition.Lambda<string>(color => color == "Black")
                     },
                 new[] {"SalesLT.Product"}
                 );
@@ -84,8 +84,8 @@ namespace Test
                     },
                 new[]
                     {
-                        SelectionCondition.CreateFromLambda<string>(color => color == "Black"),
-                        SelectionCondition.CreateFromLambda<string>(productNumber => productNumber == "HL-U509")
+                        SelectionCondition.Lambda<string>(color => color == "Black"),
+                        SelectionCondition.Lambda<string>(productNumber => productNumber == "HL-U509")
                     },
                 new[] {"SalesLT.Product"}
                 );
@@ -107,10 +107,10 @@ namespace Test
                     },
                 new[]
                     {
-                        SelectionCondition.CreateFromLambda<string>(conferenceName => conferenceName == "VLDB"),
-                        SelectionCondition.CreateFromLambda<int>(year => year >= 2009),
-                        SelectionCondition.CreateFromLambda<int>(year => year <= 2009),
-                        SelectionCondition.CreateFromLambda<int>(year => year == 2009)
+                        SelectionCondition.Lambda<string>(conferenceName => conferenceName == "VLDB"),
+                        SelectionCondition.Lambda<int>(year => year >= 2009),
+                        SelectionCondition.Lambda<int>(year => year <= 2009),
+                        SelectionCondition.Lambda<int>(year => year == 2009)
                     },
                 new[] {"Sources"}
                 );
@@ -122,8 +122,8 @@ namespace Test
                     },
                 new[]
                     {
-                        SelectionCondition.CreateFromLambda<int>(year => year >= 2008),
-                        SelectionCondition.CreateFromLambda<int>(year => year <= 2010)
+                        SelectionCondition.Lambda<int>(year => year >= 2008),
+                        SelectionCondition.Lambda<int>(year => year <= 2010)
                     },
                 new[] {"Sources"}
                 );
@@ -136,8 +136,8 @@ namespace Test
                     },
                 new[]
                     {
-                        SelectionCondition.CreateFromLambda<int>(year => year >= 2009),
-                        SelectionCondition.CreateFromLambda<String>(conferenceName => conferenceName == "ICKM")
+                        SelectionCondition.Lambda<int>(year => year >= 2009),
+                        SelectionCondition.Lambda<String>(conferenceName => conferenceName == "ICKM")
                     },
                 new[] {"Sources"}
                 );
@@ -153,15 +153,15 @@ namespace Test
         [TestMethod]
         public void TestSelectionConditions()
         {
-            var s1 = SelectionCondition.CreateFromLambda<int>(year => year > 2008);
-            var s2 = SelectionCondition.CreateFromLambda<int>(year => year >= 2008);
-            var s3 = SelectionCondition.CreateFromLambda<int>(year => year < 2010);
-            var s4 = SelectionCondition.CreateFromLambda<int>(year => year <= 2010);
-            var s5 = SelectionCondition.CreateFromLambda<int>(year => year == 2009);
-            var s6 = SelectionCondition.CreateFromLambda<int>(year => year > 2009);
-            var s7 = SelectionCondition.CreateFromLambda<int>(year => year >= 2009);
-            var s8 = SelectionCondition.CreateFromLambda<int>(year => year < 2009);
-            var s9 = SelectionCondition.CreateFromLambda<int>(year => year <= 2009);
+            var s1 = SelectionCondition.Lambda<int>(year => year > 2008);
+            var s2 = SelectionCondition.Lambda<int>(year => year >= 2008);
+            var s3 = SelectionCondition.Lambda<int>(year => year < 2010);
+            var s4 = SelectionCondition.Lambda<int>(year => year <= 2010);
+            var s5 = SelectionCondition.Lambda<int>(year => year == 2009);
+            var s6 = SelectionCondition.Lambda<int>(year => year > 2009);
+            var s7 = SelectionCondition.Lambda<int>(year => year >= 2009);
+            var s8 = SelectionCondition.Lambda<int>(year => year < 2009);
+            var s9 = SelectionCondition.Lambda<int>(year => year <= 2009);
 
             //Assert subset
             Assert.IsTrue( s5.IsSubsetOf(s1)  );

@@ -15,8 +15,8 @@ namespace Evaluation
             //Mem limit is the limitation of memory
             //Run test for different queries, then put them together.
 
-            var prg = new Prog();
-            prg.RunEvaluationMultipleSampleRates();
+            //var prg = new Prog();
+            //prg.RunEvaluationMultipleSampleRates();
         }
 
         

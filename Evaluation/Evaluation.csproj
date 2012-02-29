@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DblpSamples.cs" />
-    <Compile Include="Prog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="QueryGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -72,5 +72,10 @@ namespace DqMetricSimulator.Data
             var colType = baseCol.GetType().GetGenericArguments()[0];
             return CreateColumn(colType, filter.Select(i => baseCol[i]).OrderBy(i => i)).Set(c => c.Name = baseCol.Name);
         }
+
+        public static object CreateTable(ITable iTable, IEnumerable<IRow> allRows)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

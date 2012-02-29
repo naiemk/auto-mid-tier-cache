@@ -1,4 +1,5 @@
-﻿using DqMetricSimulator.Core;
+﻿using System;
+using DqMetricSimulator.Core;
 using DqMetricSimulator.Query;
 
 namespace AlgebraTree
@@ -8,8 +9,12 @@ namespace AlgebraTree
         EstimationResult AnswerQyeryFromTree(QueryTree tree, IQuery query);
     }
 
+    public interface IQueryNodeAnsweringService
+    {
+        EstimationResult AnswerQueryFromNode(IQueryNode node, IQuery query);
+    }
 
-    public class SimpleQueryAnsweringService:IQueryAnsweringService
+    public class SimpleQueryAnsweringService:IQueryAnsweringService, IQueryNodeAnsweringService
     {
         private readonly IDataService _dataService;
 
@@ -25,11 +30,15 @@ namespace AlgebraTree
             if (node == tree.Root)
                 return null;
             //Now answer query from node
+            return AnswerQueryFromNode(node, query);
+        }
+
+        public EstimationResult AnswerQueryFromNode(IQueryNode node, IQuery query)
+        {
             var tbl = _dataService.RunQueryAgainstNode(query, node);
             var conf = 1.0f - 1.0f/tbl.Rows.Count;
             var rv = new EstimationResult(tbl, conf);
             return rv;
         }
     }
-
 }

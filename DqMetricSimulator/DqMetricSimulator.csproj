@@ -61,11 +61,18 @@
     <Compile Include="Core\Table.cs" />
     <Compile Include="Core\TableExtensions.cs" />
     <Compile Include="Dq\IMetricFunction.cs" />
+    <Compile Include="IO\IIoProvider.cs" />
+    <Compile Include="QueryFactory\CsvQueryFactory.cs" />
+    <Compile Include="QueryFactory\QueryFactoryBase.cs" />
+    <Compile Include="Query\BasicQuery.cs" />
+    <Compile Include="Query\EqualitySelectionCondition.cs" />
     <Compile Include="Query\ExpressionHelper.cs" />
     <Compile Include="Query\IProjection.cs" />
     <Compile Include="Query\IQuery.cs" />
     <Compile Include="Query\ISelectionCondition.cs" />
     <Compile Include="Query\QueryExtensions.cs" />
+    <Compile Include="Query\SelectionCondition.cs" />
+    <Compile Include="Query\SelectionConditionFactories.cs" />
     <Compile Include="Statistics\NormalDist.cs" />
     <Compile Include="Statistics\NormalDistExample.cs" />
     <Compile Include="Simulate\SimulatedMetricFunctionInfo.cs" />
@@ -81,6 +88,7 @@
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

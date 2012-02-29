@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Common;
 using DqMetricSimulator.Core;
@@ -136,6 +137,23 @@ namespace AlgebraTree
                     SampleMaterialzied(query, addedNode.Sample);
             }
             return rv;
+        }
+
+        internal static IEnumerable<IQueryNode> FindAllIntersections(QueryTree tree, IQuery query)
+        {
+            var theParent = FindParentNode(tree, query);
+            return theParent.Childs.Where(s => s.Query.DoesIntersect(query))
+                .Concat(FindAllIntersections(tree.Root, query, theParent));
+        }
+
+        private static IEnumerable<IQueryNode> FindAllIntersections(IQueryNode node, IQuery query, IQueryNode dontLookNode)
+        {
+            if (SamplingOptions.Instance.LoockupIntersections)
+                return new IQueryNode[] {};
+            if (node == dontLookNode)
+                return new IQueryNode[] {};
+            var childo = node.Childs.Where(s => s.Query.DoesIntersect(query));
+            return childo.Concat(childo.SelectMany(s => FindAllIntersections(s, query, dontLookNode)));
         }
     }
 }
