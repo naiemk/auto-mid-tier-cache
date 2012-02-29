@@ -29,6 +29,19 @@ namespace DqMetricSimulator.Query
             _isKey = isKey;
         }
 
+        public static IProjection CreateFromName(string  colName, bool  isKey, Type type)
+        {
+            if (type == typeof(string))
+                return CreateFromName<string>(colName, isKey);
+            if (type == typeof(int))
+                return CreateFromName<int>(colName, isKey);
+            if (type == typeof(bool))
+                return CreateFromName<bool>(colName, isKey);
+            if (type == typeof(DateTime))
+                return CreateFromName<DateTime>(colName, isKey);
+            throw new InvalidOperationException(String.Format("Type {0} not supported in the ProjectionItem", type));
+        }
+
         public static IProjection CreateFromName<TIn>(string colName, bool isKey)
         {
             return new ProjectionItem(

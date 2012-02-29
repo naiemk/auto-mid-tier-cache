@@ -48,8 +48,8 @@ namespace Evaluation
         {
             var temp = new RangeSelection()
                            {
-                               R1 = SelectionCondition.CreateFromLambda(e1),
-                               R2 = SelectionCondition.CreateFromLambda(e2),
+                               R1 = SelectionCondition.Lambda(e1),
+                               R2 = SelectionCondition.Lambda(e2),
                            };
             Conds.Add(new Tuple<string, ISelectionCondition>(e1.Parameters[0].ToString(),
                                                              temp));
@@ -59,7 +59,7 @@ namespace Evaluation
         public QueryGenerator Add<T>(Expression<Func<T, bool>> e)
         {
             Conds.Add(new Tuple<string, ISelectionCondition>(e.Parameters[0].ToString(),
-                                                             SelectionCondition.CreateFromLambda(e)));
+                                                             SelectionCondition.Lambda(e)));
             return this;
         }
 
