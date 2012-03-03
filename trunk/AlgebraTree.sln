@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evaluation", "Evaluation\Evaluation.csproj", "{2E69371E-1241-4D18-A5AC-0004DBBD4626}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtraHelpers", "ExtraHelpers\ExtraHelpers.csproj", "{B27CB57B-578B-4237-803E-BBAE84ACE60C}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = AlgebraTree.vsmdi
@@ -105,6 +107,16 @@ Global
 		{2E69371E-1241-4D18-A5AC-0004DBBD4626}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2E69371E-1241-4D18-A5AC-0004DBBD4626}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2E69371E-1241-4D18-A5AC-0004DBBD4626}.Release|x86.ActiveCfg = Release|Any CPU
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Debug|x86.ActiveCfg = Debug|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Debug|x86.Build.0 = Debug|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Release|Any CPU.ActiveCfg = Release|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Release|Mixed Platforms.Build.0 = Release|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Release|x86.ActiveCfg = Release|x86
+		{B27CB57B-578B-4237-803E-BBAE84ACE60C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
