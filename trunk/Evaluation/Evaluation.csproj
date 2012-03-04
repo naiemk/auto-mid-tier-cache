@@ -47,10 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CostParameters.cs" />
     <Compile Include="DblpSamples.cs" />
+    <Compile Include="EvaluateImportedQueries.cs" />
+    <Compile Include="PreKnownLogCostService.cs" />
+    <Compile Include="Prog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="QueryGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnknownLogCostService.cs" />
     <Content Include="Scripts\vPaperConferences.sql">
       <SubType>Designer</SubType>
     </Content>

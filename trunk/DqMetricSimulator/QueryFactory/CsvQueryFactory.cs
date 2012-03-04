@@ -20,20 +20,34 @@ namespace DqMetricSimulator.QueryFactory
             CheckOption(options, "FileName", "Table");
             var fileName = options["FileName"];
             var tableName = options["Table"];
+            var metaCols = options.Where(o => o.Key.StartsWith("Meta")).Select(o => o.Value).ToList();
 
             //Read the file as csv
             var data = ReadTableFromCsv(fileName);
             var projections = ProjectionsFromTable(data);
-            var queries =
+            var queriesWithMeta =
                 data.Rows.Cast<DataRow>().Select(dr =>
-                                                 new BasicQuery(projections,
+                    Tuple.Create(
+                                                 (IQuery) new BasicQuery(projections,
                                                                 dr.ItemArray.Select((o, i) => new {o, i}).
-                                                                Where(oi => oi.o != DBNull.Value).Select(
-                                                                    oi =>
-                                                                    EqualitySelectionConditionFromColumn(
-                                                                        dr.Table.Columns[oi.i], oi.o)), new[] {tableName}
-                                                     ));
-            return queries;
+                                                                    Where(oi => oi.o != DBNull.Value &&
+                                                                                !metaCols.Contains(
+                                                                                    data.Columns[oi.i].ColumnName)).
+                                                                    Select(
+                                                                        oi =>
+                                                                        EqualitySelectionConditionFromColumn(
+                                                                            dr.Table.Columns[oi.i], oi.o)),
+                                                                new[] {tableName}
+                                                     ),
+                                                     ExtractMetadata(dr, metaCols)));
+            _queriesWithMeta = queriesWithMeta;
+            return queriesWithMeta.Select(q => q.Item1);
+        }
+
+        private static object[] ExtractMetadata(DataRow dr, IEnumerable<string> metaCols)
+        {
+            return dr.ItemArray.Select((v, i) => metaCols.Contains(dr.Table.Columns[i].ColumnName) ? v : null).Where(
+                v => v != null).ToArray();
         }
 
         private static void CheckOption(IDictionary<string, string> options, params string[] names)
@@ -70,6 +84,12 @@ namespace DqMetricSimulator.QueryFactory
                                                                          {":int", typeof(int)}
                                                                      };
         private static readonly Regex TextFinder = new Regex(@"""?,\s*""?");
+        private IEnumerable<Tuple<IQuery, object[]>> _queriesWithMeta;
+
+        public IEnumerable<Tuple<IQuery, object[]>> QueriesWithMeta
+        {
+            get { return _queriesWithMeta; }
+        }
 
         private static DataTable ReadTableFromCsv(string fileName)
         {
