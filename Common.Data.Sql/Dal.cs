@@ -24,13 +24,18 @@ namespace Common.Data.Sql
 
         public DataTable GetDataTable(string connStr, string query)
         {
+            var ds = GetDataSet(connStr, query);
+            return ds.Tables[0];
+        }
+        public DataSet GetDataSet(string connStr, string query)
+        {
             _logger.Log(String.Format("Getting data table for quert: {0}", query));
             return RunCommandWithParameter(connStr, query, new SqlParameter[] {}, c =>
                                                                                       {
                                                                                         var da = new SqlDataAdapter(c);
-                                                                                        var dt = new DataTable();
-                                                                                        da.Fill(dt);
-                                                                                        return dt;
+                                                                                        var ds = new DataSet();
+                                                                                        da.Fill(ds);
+                                                                                        return ds;
                                                                                       });
         }
 
