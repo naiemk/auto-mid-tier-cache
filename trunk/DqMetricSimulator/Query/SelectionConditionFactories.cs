@@ -19,7 +19,7 @@ namespace DqMetricSimulator.Query
         public static ISelectionCondition Equality<T>(string attributeName, T value)
         {
             var param = Expression.Parameter(typeof (T), attributeName);
-            var parameters = new HashSet<ParameterExpression>();
+            var parameters = new HashSet<ParameterExpression>(new[]{param});
             var valExp = Expression.Constant(value, typeof (T));
             var expression = Expression.Equal(param, valExp);
             return new EqualitySelectionCondition(parameters, expression);

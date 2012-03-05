@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using DqMetricSimulator.Core;
 
@@ -29,9 +30,17 @@ namespace DqMetricSimulator.Data
         private static IRow GetTableRow(ITable table, DataRow r)
         {
             var rv = new Row();
-            r.ItemArray.Select((o, i) => table.Columns[i].BinarySearch(o)).ToList()
+            r.ItemArray.Select((o, i) => SearchOrCreateRow(table, i, r[i])).ToList()
                 .ForEach(idx => rv.Rows.Add(idx));
             return rv;
+        }
+
+        private static int SearchOrCreateRow(ITable table, int column, object data)
+        {
+            var idx = table.Columns[column].BinarySearch(data);
+            if (idx<0)
+                table.Columns[column].Add(data);
+            return table.Columns[column].BinarySearch(data);
         }
 
         private static IColumn CreateAndFillColumn(DataColumn dataColumn)

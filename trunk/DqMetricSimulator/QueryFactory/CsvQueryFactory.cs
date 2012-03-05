@@ -20,11 +20,11 @@ namespace DqMetricSimulator.QueryFactory
             CheckOption(options, "FileName", "Table");
             var fileName = options["FileName"];
             var tableName = options["Table"];
-            var metaCols = options.Where(o => o.Key.StartsWith("Meta")).Select(o => o.Value).ToList();
+            var metaCols = options.Where(o => o.Key.StartsWith("Meta")).Select(o => o.Value.ToLowerInvariant()).ToList();
 
             //Read the file as csv
             var data = ReadTableFromCsv(fileName);
-            var projections = ProjectionsFromTable(data);
+            var projections = ProjectionsFromTable(data, metaCols);
             var queriesWithMeta =
                 data.Rows.Cast<DataRow>().Select(dr =>
                     Tuple.Create(
@@ -32,7 +32,7 @@ namespace DqMetricSimulator.QueryFactory
                                                                 dr.ItemArray.Select((o, i) => new {o, i}).
                                                                     Where(oi => oi.o != DBNull.Value &&
                                                                                 !metaCols.Contains(
-                                                                                    data.Columns[oi.i].ColumnName)).
+                                                                                    data.Columns[oi.i].ColumnName.ToLowerInvariant())).
                                                                     Select(
                                                                         oi =>
                                                                         EqualitySelectionConditionFromColumn(
@@ -46,7 +46,7 @@ namespace DqMetricSimulator.QueryFactory
 
         private static object[] ExtractMetadata(DataRow dr, IEnumerable<string> metaCols)
         {
-            return dr.ItemArray.Select((v, i) => metaCols.Contains(dr.Table.Columns[i].ColumnName) ? v : null).Where(
+            return dr.ItemArray.Select((v, i) => metaCols.Contains(dr.Table.Columns[i].ColumnName.ToLowerInvariant()) ? v : null).Where(
                 v => v != null).ToArray();
         }
 
@@ -58,9 +58,10 @@ namespace DqMetricSimulator.QueryFactory
             }
         }
 
-        private static IEnumerable<IProjection> ProjectionsFromTable(DataTable data)
+        private static IEnumerable<IProjection> ProjectionsFromTable(DataTable data, IEnumerable<string> metaCos)
         {
             return (from DataColumn column in data.Columns
+                    where !metaCos.Contains(column.ColumnName.ToLowerInvariant())
                     select ProjectionItem.CreateFromName(column.ColumnName, false, column.DataType)).ToList();
         }
 

@@ -50,12 +50,14 @@
     <Compile Include="CostParameters.cs" />
     <Compile Include="DblpSamples.cs" />
     <Compile Include="EvaluateImportedQueries.cs" />
+    <Compile Include="ImportQueriesAndEvaluate.cs" />
     <Compile Include="PreKnownLogCostService.cs" />
     <Compile Include="Prog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="QueryGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnknownLogCostService.cs" />
+    <Content Include="Resources\Data\CreateObjects.sql" />
     <Content Include="Scripts\vPaperConferences.sql">
       <SubType>Designer</SubType>
     </Content>
@@ -69,11 +71,16 @@
       <Project>{878A8253-C096-479E-B0D7-C3DDD3295327}</Project>
       <Name>AlgebraTree</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common.Data.Sql\Common.Data.Sql.csproj">
+      <Project>{E546C6E7-2F5D-47E1-B7E1-5D4A65DB1577}</Project>
+      <Name>Common.Data.Sql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DqMetricSimulator\DqMetricSimulator.csproj">
       <Project>{79E206D8-CADC-44E7-A6C8-38CDF1451E0A}</Project>
       <Name>DqMetricSimulator</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

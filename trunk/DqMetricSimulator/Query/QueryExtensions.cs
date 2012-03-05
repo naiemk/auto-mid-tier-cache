@@ -35,7 +35,7 @@ namespace DqMetricSimulator.Query
             switch (op1)
             {
                 case ExpressionType.Equal:
-                    return (var1 == var2 && con1 == con2) ||
+                    return (var1 == var2 && ConstantIsEqual(con1, con2)) ||
                            (var1 == var2 && op2 == ExpressionType.GreaterThan && ConstantIsGt(con1, con2)) ||
                            (var1 == var2 && op2 == ExpressionType.GreaterThanOrEqual && ConstantIsGte(con1, con2)) ||
                            (var1 == var2 && op2 == ExpressionType.LessThan && ConstantIsGt(con2, con1)) ||
@@ -88,7 +88,7 @@ namespace DqMetricSimulator.Query
             switch (op1)
             {
                 case ExpressionType.Equal:
-                    return (var1 == var2 && con1 == con2) ||
+                    return (var1 == var2 && ConstantIsEqual(con1, con2)) ||
                            (var1 == var2 && op2 == ExpressionType.GreaterThan && ConstantIsGt(con1, con2)) ||
                            (var1 == var2 && op2 == ExpressionType.GreaterThanOrEqual && ConstantIsGte(con1, con2)) ||
                            (var1 == var2 && op2 == ExpressionType.LessThan && ConstantIsGt(con2, con1)) ||
@@ -120,6 +120,11 @@ namespace DqMetricSimulator.Query
                 default: //Unsupported operation
                     return false;
             }
+        }
+
+        private static bool ConstantIsEqual(object con1, object con2)
+        {
+            return con1.Equals(con2);
         }
 
 

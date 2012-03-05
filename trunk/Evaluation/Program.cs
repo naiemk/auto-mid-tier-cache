@@ -17,6 +17,9 @@ namespace Evaluation
 
             //var prg = new Prog();
             //prg.RunEvaluationMultipleSampleRates();
+
+            var prog = new ImportQueriesAndEvaluate();
+            prog.ExecuteForDifferentCostLimit();
         }
 
         

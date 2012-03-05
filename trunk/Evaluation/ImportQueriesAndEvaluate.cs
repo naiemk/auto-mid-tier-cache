@@ -18,13 +18,13 @@ namespace Evaluation
         private string _costColumn = "Cost";
         private static ILogger _logger = new DebugLogger();
         private Dal _dal = new Dal(_logger, new Progress(_logger, 10));
-        private float _coverage = 0.1f;
+        private float _coverage = 0.9f;
         private string _outFolder = @"C:\NKProg\JisEval\";
         private float _samplingRate = 0.05f;
 
         private string ConnectionString
         {
-            get { return String.Format("Database={0}; Initial Catalog={1}; IntegratedSecurity=SSPI", _server, _database); }
+            get { return String.Format("Database={0}; Initial Catalog={1}; Integrated Security=SSPI", _server, _database); }
         }
 
         /// <summary>
@@ -32,17 +32,18 @@ namespace Evaluation
         /// </summary>
         public void ExecuteForDifferentCostLimit()
         {
-            var rv = _dal.GetDataSet(ConnectionString, String.Format(" exec GenerateQueries {0}, {1}", _coverage, 28000));
+            var rv = _dal.GetDataSet(ConnectionString, String.Format(" exec GenerateQueries {0}, {1}", _coverage, 10000));
             var actualCoverage = (float)(decimal)rv.Tables[0].Rows[0]["coverage"];
 
             var data = ExportToCsv(rv.Tables[1]);
-            var outFile = Path.Combine(_outFolder, String.Format("Data{0}", new Guid()));
+            var outFile = Path.Combine(_outFolder, String.Format("Data{0}.csv", new Guid()));
             File.WriteAllText(outFile, data);
 
-            var outResultFile = Path.Combine(_outFolder, String.Format("Result{0}", new Guid()));
+            var outResultFile = Path.Combine(_outFolder, String.Format("Result{0}.csv", new Guid()));
             var sb = new StringBuilder(String.Format("{0},Coverage={1}", EvaluateImportedQueries.Titles, actualCoverage));
+            sb.AppendLine();
             //Run for different cost limits
-            for (var size = 0; size < 100000; size += 1000)
+            for (var size = 100; size < 10000; size += 1000)
             {
                 var evaler = new EvaluateImportedQueries();
                 evaler.Initialize(outFile, _server, _database, _table, _dqColumn, _popularityColumn, _costColumn,
