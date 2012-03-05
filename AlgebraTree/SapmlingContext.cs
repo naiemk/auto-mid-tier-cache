@@ -108,9 +108,9 @@ namespace AlgebraTree
                 //Result is too small to sample. Re generate the skip rate
                 skiprate = result.Rows.Count/5;
             }
-            int ii;
+            skiprate = Math.Max((int) ((float) result.Rows.Count/Math.Max(5, skiprate)), 1);
             var sampleResult = sample.Sample.Table;//TableFactory.CreateTable(result);
-            var filter = result.Rows.Select((r,i) => new {r,i}).Where(x => skiprate == 0 || Math.DivRem(x.i, skiprate, out ii) == 0).Select(r => r.r)
+            var filter = result.Rows.Select((r,i) => new {r,i}).Where(x => skiprate == 0 || x.i % skiprate == 0).Select(r => r.r)
                 .ToList();
 
             sampleResult.FillFromFilter(result, filter);

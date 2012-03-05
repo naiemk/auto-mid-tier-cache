@@ -30,6 +30,8 @@ namespace Evaluation
             _maxCost = _queries.Max(q => q.Sample.Table.Rows.Count);
             _minPop = _queries.Min(q => q.Popularity.Item1);
             _maxPop = _queries.Max(q => q.Popularity.Item1);
+            if (_minCost == _maxCost || _minPop == _maxPop)
+                return true;
             var distance = GetDistance(sample.Cardinality, sample.Popularity);
             _distances.Add(distance, sample);
             var pivotPoint = _distances.ToArray()[_distances.Count - (int) (_distances.Count*_acceptRate) - 1].Key;

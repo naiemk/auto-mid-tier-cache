@@ -29,6 +29,7 @@ namespace Test
         {
             var eq = SelectionCondition.Equality("a", "val");
             Assert.AreEqual("(a == \"val\")", eq.Expression.ToString());
+            Assert.AreEqual(eq.Parameters.Count, 1);
 
             string indirect = "val";
             eq = SelectionCondition.Equality("a", indirect);

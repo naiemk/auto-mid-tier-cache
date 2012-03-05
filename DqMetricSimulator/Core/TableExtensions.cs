@@ -14,7 +14,8 @@ namespace DqMetricSimulator.Core
 
         public static object GetValueByColumn(this ITable table, string colName, IRow row)
         {
-            var colId = table.Columns.Where(c => c.Name.Equals(colName,StringComparison.CurrentCultureIgnoreCase)).Select((c, i) => (int?)i).FirstOrDefault();
+            var colId = table.Columns.Select((c,i) => new {c, i}) .Where(c => c.c.Name.Equals(colName,StringComparison.CurrentCultureIgnoreCase))
+                .Select(c => (int?)c.i).FirstOrDefault();
             if (colId == null)
                 throw new ArgumentOutOfRangeException(String.Format("Column '{0}' not found.", colName));
             return GetValue(table, colId.Value, row);
