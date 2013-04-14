@@ -112,7 +112,7 @@ namespace Evaluation
         {
             var ds = new SimpleSqlDataService(ConnectionString);
             var qas = new SimpleQueryAnsweringService(ds);
-            var cs = new UnknownLogCostService(_costs.Size, 100);
+            var cs = new UnknownLogCostService((float)_costs.Size/1600, 30);
             var dqs = new SuperSimpleDqService();
             var context = new SapmlingContext(qas, cs, ds, dqs) {SamplingRate = _costs.BaseSamplingRate, ConfidenceThreshold = _costs.Confidence};
             return RunTest(context, _queries, _costs.Size, _costs.BaseSamplingRate, _dqColumn);

@@ -32,18 +32,18 @@ namespace Evaluation
         /// </summary>
         public void ExecuteForDifferentCostLimit()
         {
-            var rv = _dal.GetDataSet(ConnectionString, String.Format(" exec GenerateQueries {0}, {1}", _coverage, 10000));
+            var rv = _dal.GetDataSet(ConnectionString, String.Format(" exec GenerateQueries {0}, {1}", _coverage, 250));
             var actualCoverage = (float)(decimal)rv.Tables[0].Rows[0]["coverage"];
 
             var data = ExportToCsv(rv.Tables[1]);
-            var outFile = Path.Combine(_outFolder, String.Format("Data{0}.csv", new Guid()));
+            var outFile = Path.Combine(_outFolder, String.Format("Data{0}.csv", Guid.NewGuid()));
             File.WriteAllText(outFile, data);
 
-            var outResultFile = Path.Combine(_outFolder, String.Format("Result{0}.csv", new Guid()));
+            var outResultFile = Path.Combine(_outFolder, String.Format("Result{0}.csv", Guid.NewGuid()));
             var sb = new StringBuilder(String.Format("{0},Coverage={1}", EvaluateImportedQueries.Titles, actualCoverage));
             sb.AppendLine();
             //Run for different cost limits
-            for (var size = 100; size < 10000; size += 1000)
+            for (var size = 10; size < 1600; size += 100)
             {
                 var evaler = new EvaluateImportedQueries();
                 evaler.Initialize(outFile, _server, _database, _table, _dqColumn, _popularityColumn, _costColumn,
@@ -70,7 +70,7 @@ namespace Evaluation
 
         public void ExecuteForDifferentSamplingRate()
         {
-            for(_samplingRate = 0.01f; _samplingRate < 0.1f; _samplingRate += 0.1f)
+            for(_samplingRate = 0.01f; _samplingRate < 0.25f; _samplingRate += 0.05f)
             {
                 ExecuteForDifferentCostLimit();
             }
