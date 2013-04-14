@@ -25,23 +25,35 @@ namespace Evaluation
 
         public bool CanMaterialize(IQueryNode sample, IQuery query)
         {
+            var rv = false;
             _queries.Add(sample);
             _minCost = _queries.Min(q => q.Sample.Table.Rows.Count);
             _maxCost = _queries.Max(q => q.Sample.Table.Rows.Count);
             _minPop = _queries.Min(q => q.Popularity.Item1);
             _maxPop = _queries.Max(q => q.Popularity.Item1);
             if (_minCost == _maxCost || _minPop == _maxPop)
-                return true;
-            var distance = GetDistance(sample.Cardinality, sample.Popularity);
-            _distances.Add(distance, sample);
-            var pivotPoint = _distances.ToArray()[_distances.Count - (int) (_distances.Count*_acceptRate) - 1].Key;
+            {
+                //only return true if the query is in the top C rate of sum of cost
+                var sumCost = _queries.Sum(q => q.Sample.Table.Rows.Count);
+                if ( sample.Sample.Table.Rows.Count < (_acceptRate * sumCost))
+                rv = true;
+            }
+            else
+            {
+                var distance = GetDistance(sample.Cardinality, sample.Popularity);
+                _distances.Add(distance, sample);
+                var pivotPoint = _distances.ToArray()[_distances.Count - (int) (_distances.Count*_acceptRate) - 1].Key;
+                rv = distance < pivotPoint;
+            }
             if (_queries.Count > _maxMovingAverageSize)
             {
                 var toDel = _queries[0];
-                _distances.Remove(_distances.Where(d => d.Value.Equals(toDel)).First().Key);
+                var toDelFromDistance = _distances.Select(d => new {d}).Where(d => d.d.Value.Equals(toDel)).FirstOrDefault();
+                if (toDelFromDistance != null)
+                    _distances.Remove(toDelFromDistance.d.Key);
                 _queries.RemoveAt(0);
             }
-            return distance < pivotPoint;
+            return rv;
         }
 
         private float GetDistance(long cost, Popularity pop)
